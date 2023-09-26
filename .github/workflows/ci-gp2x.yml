@@ -1,0 +1,28 @@
+name: TC (GP2X)
+on: [push, pull_request]
+env:
+  REGISTRY: ghcr.io
+  TC: gp2x
+
+jobs:
+  build-container:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - uses: actions/checkout@v3
+    - name: registry login
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: build/push container
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: "Dockerfile-${{ env.TC }}"
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ github.actor }}/toolchain-${{ env.TC }}
+
