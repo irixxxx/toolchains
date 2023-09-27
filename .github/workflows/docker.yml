@@ -1,12 +1,14 @@
-name: TC (Dingux)
+name: DockerLayer
 on: [push, pull_request]
 env:
   REGISTRY: ghcr.io
-  TC: dingux
 
 jobs:
   build-container:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tc: [dingux, gcw0, gp2x, opendingux, retrofw]
     permissions:
       contents: read
       packages: write
@@ -22,7 +24,9 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: .
-        file: "Dockerfile-${{ env.TC }}"
+        file: "Dockerfile-${{ matrix.tc }}"
         push: true
-        tags: ${{ env.REGISTRY }}/${{ github.actor }}/toolchain-${{ env.TC }}
+        tags: ${{ env.REGISTRY }}/${{ github.actor }}/toolchain-${{ matrix.tc }}
+
+
 
