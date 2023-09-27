@@ -18,7 +18,7 @@ jobs:
       uses: docker/login-action@v3
       with:
         registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
+        username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: build/push container
       uses: docker/build-push-action@v5
@@ -26,7 +26,7 @@ jobs:
         context: .
         file: "Dockerfile-${{ matrix.tc }}"
         push: true
-        tags: ${{ env.REGISTRY }}/${{ github.actor }}/toolchain-${{ matrix.tc }}
+        tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/toolchain-${{ matrix.tc }}
 
 
 
