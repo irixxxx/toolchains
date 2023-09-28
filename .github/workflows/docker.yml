@@ -26,6 +26,7 @@ jobs:
         context: .
         file: "Dockerfile-${{ matrix.tc }}"
         push: true
+        provenance: false
         tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/toolchain-${{ matrix.tc }}
 
 
