@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tc: [dingux, gcw0, gp2x, opendingux, retrofw]
+        tc: [dingux, gp2x, opendingux, retrofw]
     permissions:
       contents: read
       packages: write
