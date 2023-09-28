@@ -6,13 +6,16 @@
 #    -msoft-float uses the fpu setting for determining the parameter passing;
 #    default upto gcc 4.7 was -mfpu=fpa, which has been removed in gcc 4.8
 
-FROM --platform=linux/386 ubuntu:18.04
+# the toolchain is x86 32 bit. However, since github blessed us with actions exclusively running on x86 64 bit...
+#FROM --platform=linux/386 debian:bullseye
+FROM --platform=linux/amd64 debian:bullseye
 
 ENV UNPRIVILEGED_USER_GROUPS=sudo
 
 # minimal build environment
 RUN	apt-get update && \
-	apt-get -y --no-install-recommends install sudo make vim git-core wget curl zip gcc g++ ca-certificates
+	apt-get -y --no-install-recommends install sudo make vim git-core wget curl zip bzip2 xz-utils gcc g++ ca-certificates && \
+	apt-get -y --no-install-recommends install libc6-i386 libstdc++6-i386-cross
 
 # toolchain and libraries
 # NB arm-none-eabi uses crt0.o as start file, while open2x libs offer crt1.o, so provide a link

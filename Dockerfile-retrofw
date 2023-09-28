@@ -2,7 +2,7 @@
 # retro game (rs97), rg300, ldk, pap k3, and similar devices 
 
 # libs and compiler from : retrofw-2.3 2022 toolchain
-FROM --platform=linux/amd64 ubuntu:22.04
+FROM --platform=linux/amd64 debian:bullseye
 
 ENV UNPRIVILEGED_USER_GROUPS=sudo
 

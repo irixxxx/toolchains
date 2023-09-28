@@ -4,14 +4,16 @@
 # libs and compiler from: opendingux 2012 toolchain
 # TODO: check if odbeta toolchain could be used with the old libs, like gcw-0
 
-FROM --platform=linux/386 ubuntu:18.04
-#FROM --platform=linux/amd64 ubuntu:22.04
+# the toolchain is x86 32 bit. However, since github blessed us with actions exclusively running on x86 64 bit...
+#FROM --platform=linux/386 debian:bullseye
+FROM --platform=linux/amd64 debian:bullseye
 
 ENV UNPRIVILEGED_USER_GROUPS=sudo
 
 # minimal build environment
 RUN	apt-get update && \
-	apt-get -y --no-install-recommends install sudo make vim git-core wget curl zip bzip2 xz-utils gcc g++ ca-certificates
+	apt-get -y --no-install-recommends install sudo make vim git-core wget curl zip bzip2 xz-utils gcc g++ ca-certificates && \
+	apt-get -y --no-install-recommends install libc6-i386 libstdc++6-i386-cross
 
 # toolchain and libraries
 #RUN	wget --no-check-certificate "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/dingoo-linux/dingux_toolchain_20091022.tar.bz2" && \

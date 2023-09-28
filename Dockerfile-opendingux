@@ -4,8 +4,9 @@
 # libs from	: opendingux 2014 (updated 2021) toolchain, gcc 4.9
 # compiler from	: odbeta 2021 toolchain
 
-#FROM --platform=linux/386 ubuntu:18.04
-FROM --platform=linux/amd64 ubuntu:22.04
+# the gcw0 toolchain is x86 32 bit. However, since github blessed us with actions exclusively running on x86 64 bit...
+#FROM --platform=linux/386 debian:bookworm
+FROM --platform=linux/amd64 debian:bookworm
 
 ENV UNPRIVILEGED_USER_GROUPS=sudo
 
