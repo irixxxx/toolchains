@@ -1,0 +1,26 @@
+# build container for (open)pandora
+
+# libs and compiler from : pandora 2011 toolchain
+
+# the toolchain is x86 32 bit. However, since github blessed us with actions exclusively running on x86 64 bit...
+#FROM --platform=linux/386 debian:bullseye
+FROM --platform=linux/amd64 debian:bullseye
+
+ENV UNPRIVILEGED_USER_GROUPS=sudo
+
+# minimal build environment
+RUN	apt-get update && \
+	apt-get -y --no-install-recommends install sudo make vim git-core wget curl zip bzip2 xz-utils file gcc g++ ca-certificates && \
+	apt-get -y --no-install-recommends install libc6-i386 libstdc++6-i386-cross
+
+# toolchain and libraries
+RUN	wget --no-check-certificate "http://sebt3.openpandora.org/buildtools/pandora-toolchain-20110313.tar.bz2" && \
+	mkdir /opt/pandora-toolchain && \
+	tar xjCf /opt/pandora-toolchain pandora-toolchain-20110313.tar.bz2
+# this file is mysteriously missing from the official toolchain :-|
+COPY	pandora/omapfb.h /opt/pandora-toolchain/arm-angstrom-linux-gnueabi/usr/include/linux/
+
+# toolchain definitions
+ENV PATH=/opt/pandora-toolchain/bin:$PATH
+ENV LD_LIBRARY_PATH=/opt/pandora-toolchain/host-lib
+ENV CROSS_COMPILE=arm-angstrom-linux-gnueabi-

@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tc: [dingux, gp2x, opendingux, retrofw]
+        tc: [gp2x, pandora, dingux, opendingux, retrofw]
     permissions:
       contents: read
       packages: write
@@ -28,6 +28,4 @@ jobs:
         push: true
         provenance: false
         tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/toolchain-${{ matrix.tc }}
-
-
 
