@@ -32,6 +32,7 @@ ENV PATH=/opt/gcc-arm-none-eabi-4_7-2014q2/bin:$PATH
 ENV TC=/opt/open2x/gcc-4.1.1-glibc-2.3.6
 ENV CFLAGS="-U_FORTIFY_SOURCE -D__linux__ -mcpu=arm920t -mfloat-abi=soft -mabi=apcs-gnu -mfpu=fpa -mno-thumb-interwork --sysroot=$TC/arm-open2x-linux -I$TC/arm-open2x-linux/include -I/home/include"
 ENV LDFLAGS="$CFLAGS -B$TC/arm-open2x-linux/lib -B$TC/lib/gcc/arm-open2x-linux/4.1.1 -L/home/lib -Wl,-Ttext-segment=0x10100"
+ENV CROSS_COMPILE=arm-none-eabi-
 
 # additional libraries
 RUN	cd /home && mkdir /home/lib /home/include && \
