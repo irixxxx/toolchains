@@ -1,4 +1,4 @@
-# build container for (open)pandora
+# build container for (open)pandora (OMAP with Cortex A8)
 
 # libs and compiler from : notaz pandora toolchains
 
