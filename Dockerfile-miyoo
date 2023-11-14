@@ -1,0 +1,33 @@
+# start with the ubuntu base image
+FROM --platform=linux/amd64 debian:bookworm
+
+# install build dependencies
+# first two lines are needed just to build the toolchain
+# dosfstools & u-boot-tools are for mainboot generation scripts
+# python-dev & swig are needed to build uboot
+# finally, run some cleanup
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends file bc patch \
+	wget cpio zip unzip bzip2 xz-utils rsync git subversion bison python3 swig \
+	make cmake gcc g++ automake autoconf pkgconf dosfstools u-boot-tools \
+	ca-certificates && \
+    apt-get -y autoremove && apt-get -y clean
+
+# it doesn't like running as root, but meh
+ARG FORCE_UNSAFE_CONFIGURE=1
+# Download the source, compile and "install" the toolchain, cleanup
+RUN git clone https://github.com/MiyooCFW/buildroot.git && \
+    cd buildroot && \
+    make miyoo_uclibc_static_defconfig && make sdk && \
+    mv output/host/ /opt/miyoo && \
+    cd .. && \
+    rm -rf buildroot
+
+# set up some env properties (these are based on Arcnor's image)
+ENV CROSS_ROOT=/opt/miyoo
+ENV CROSS_TRIPLE=arm-miyoo-linux-uclibcgnueabi
+ENV SYSROOT="${CROSS_ROOT}/${CROSS_TRIPLE}/sysroot"
+ENV PATH=":${PATH}:${CROSS_ROOT}/bin:${SYSROOT}/usr/bin"
+ENV ARCH=arm
+ENV CROSS_COMPILE="${CROSS_TRIPLE}-"
+
