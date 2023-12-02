@@ -1,7 +1,7 @@
 # build container for opendingux with JZ4770:
 # gcw-0, rg350/280, gkd350h/mini, and similar devices
 
-# libs from	: opendingux 2014 (updated 2021) toolchain, gcc 4.9
+# libs from	: opendingux 2014 toolchain, gcc 4.9
 # compiler from	: odbeta 2021 toolchain
 
 # the gcw0 toolchain is x86 32 bit. However, since github blessed us with actions exclusively running on x86 64 bit...
@@ -17,19 +17,25 @@ RUN	apt-get update && \
 
 # toolchain and libraries
 # 2014 toolchain uses gcc 4.9, but we can use the current 2021 od beta toolchain's gcc to get a better optimisation
+# the Rogue FW toolchain cannot be used since it has some newer library versions not available in gcw0 opendingux
+#RUN	wget --no-check-certificate "https://github.com/Ninoh-FOX/toolchain/releases/download/08-09-2021/opendingux-gcw0-toolchain.2021-09-08.tar.bz2" && \
+#	tar xjCf /opt opendingux-gcw0-toolchain.2021-09-08.tar.bz2
 RUN	wget --no-check-certificate "https://od.abstraction.se/opendingux/toolchain/opendingux-gcw0-toolchain.2021-10-22.tar.xz" && \
 	tar xaCf /opt opendingux-gcw0-toolchain.2021-10-22.tar.xz && \
 	mv /opt/gcw0-toolchain /opt/gcw0-toolchain-od
-#RUN	wget --no-check-certificate "https://web.archive.org/web/http://www.gcw-zero.com/files/opendingux-gcw0-toolchain.2014-08-20.tar.bz2" && \
+RUN	wget --no-check-certificate "https://web.archive.org/web/http://www.gcw-zero.com/files/opendingux-gcw0-toolchain.2014-08-20.tar.bz2" && \
 #RUN	wget --no-check-certificate "https://git.libretro.com/libretro-infrastructure/libretro-build-dingux/-/raw/master/toolchain/opendingux-gcw0-toolchain.2014-08-20.tar.bz2" && \
-RUN	wget --no-check-certificate "https://github.com/Ninoh-FOX/toolchain/releases/download/08-09-2021/opendingux-gcw0-toolchain.2021-09-08.tar.bz2" && \
-	tar xjCf /opt opendingux-gcw0-toolchain.2021-09-08.tar.bz2
+	tar xjCf /opt opendingux-gcw0-toolchain.2014-08-20.tar.bz2
 
 # toolchain definitions
+#ENV LD_LIBRARY_PATH=/usr/i686-linux-gnu/lib
+#ENV PATH=/opt/gcw0-toolchain/usr/bin:$PATH
+ENV PATH=/opt/gcw0-toolchain-od/usr/bin:$PATH
+ENV TC=/opt/gcw0-toolchain
+ENV TS=$TC/usr/mipsel-gcw0-linux-uclibc/sysroot
+ENV CFLAGS="--sysroot $TS -I$TS/usr/include/SDL -mabicalls"
+ENV LDFLAGS="$CFLAGS -Wl,--dynamic-linker=/lib/ld-uClibc.so.0 -B$TC/usr/lib/gcc/mipsel-gcw0-linux-uclibc/4.9.1"
 # NB on newer GKD firmware there's a problem with missing exception handlers in
 # libgcc_s.so. Undefining those functions and linking in libgcc_eh solves this.
-ENV PATH=/opt/gcw0-toolchain-od/usr/bin:$PATH
-ENV TS=/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot
-ENV CFLAGS="--sysroot $TS -I$TS/usr/include/SDL -mabicalls"
-ENV LDFLAGS="$CFLAGS -Wl,--dynamic-linker=/lib/ld-uClibc.so.0 -u__register_frame_info -u__deregister_frame_info -L$TS/../lib -lgcc_eh"
+ENV LDFLAGS="$LDFLAGS -u__register_frame_info -u__deregister_frame_info -L$TS/../lib -lgcc_eh"
 ENV CROSS_COMPILE=mipsel-linux-
