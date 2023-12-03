@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tc: [gp2x, pandora, dingux, opendingux, retrofw, odbeta-gcw0, odbeta-lepus, miyoo]
+        tc: [gp2x, pandora, dingux, opendingux, retrofw, odbeta-gcw0, odbeta-lepus, odbeta-rs90, miyoo]
     permissions:
       contents: read
       packages: write
