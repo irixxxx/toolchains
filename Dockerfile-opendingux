@@ -20,8 +20,10 @@ RUN	apt-get update && \
 # the Rogue FW toolchain cannot be used since it has some newer library versions not available in gcw0 opendingux
 #RUN	wget --no-check-certificate "https://github.com/Ninoh-FOX/toolchain/releases/download/08-09-2021/opendingux-gcw0-toolchain.2021-09-08.tar.bz2" && \
 #	tar xjCf /opt opendingux-gcw0-toolchain.2021-09-08.tar.bz2
-RUN	wget --no-check-certificate "https://od.abstraction.se/opendingux/toolchain/opendingux-gcw0-toolchain.2021-10-22.tar.xz" && \
-	tar xaCf /opt opendingux-gcw0-toolchain.2021-10-22.tar.xz && \
+#RUN	wget --no-check-certificate "https://od.abstraction.se/opendingux/toolchain/opendingux-gcw0-toolchain.2021-10-22.tar.xz" && \
+#	tar xaCf /opt opendingux-gcw0-toolchain.2021-10-22.tar.xz && \
+RUN	wget --no-check-certificate "https://github.com/OpenDingux/buildroot/releases/download/od-2022.09.22/opendingux-gcw0-toolchain.2022-09-22.tar.xz" && \
+	tar xaCf /opt opendingux-gcw0-toolchain.2022-09-22.tar.xz && \
 	mv /opt/gcw0-toolchain /opt/gcw0-toolchain-od
 RUN	wget --no-check-certificate "https://web.archive.org/web/http://www.gcw-zero.com/files/opendingux-gcw0-toolchain.2014-08-20.tar.bz2" && \
 #RUN	wget --no-check-certificate "https://git.libretro.com/libretro-infrastructure/libretro-build-dingux/-/raw/master/toolchain/opendingux-gcw0-toolchain.2014-08-20.tar.bz2" && \

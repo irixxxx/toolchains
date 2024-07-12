@@ -13,8 +13,10 @@ RUN	apt-get update && \
 	apt-get -y --no-install-recommends install
 
 # toolchain and libraries
-RUN	wget --no-check-certificate "https://od.abstraction.se/opendingux/toolchain/opendingux-gcw0-toolchain.2021-10-22.tar.xz" && \
-	tar xaCf /opt opendingux-gcw0-toolchain.2021-10-22.tar.xz
+#RUN	wget --no-check-certificate "https://web.archive.org/web/https://od.abstraction.se/opendingux/toolchain/opendingux-gcw0-toolchain.2021-10-22.tar.xz" && \
+#	tar xaCf /opt opendingux-gcw0-toolchain.2021-10-22.tar.xz
+RUN	wget --no-check-certificate "https://github.com/OpenDingux/buildroot/releases/download/od-2022.09.22/opendingux-gcw0-toolchain.2022-09-22.tar.xz" && \
+	tar xaCf /opt opendingux-gcw0-toolchain.2022-09-22.tar.xz
 
 # toolchain definitions
 ENV PATH=/opt/gcw0-toolchain/usr/bin:$PATH
