@@ -11,7 +11,8 @@ ENV UNPRIVILEGED_USER_GROUPS=sudo
 # minimal build environment
 RUN	apt-get update && \
 	apt-get -y --no-install-recommends install sudo make vim git-core wget curl zip bzip2 xz-utils file gcc g++ ca-certificates && \
-	apt-get -y --no-install-recommends install squashfs-tools libc6-i386 libstdc++6-i386-cross
+	apt-get -y --no-install-recommends install squashfs-tools libc6-i386 libstdc++6-i386-cross && \
+	apt-get -y autoremove && apt-get -y clean
 
 # toolchain and libraries
 RUN	wget --no-check-certificate "http://sebt3.openpandora.org/buildtools/pandora-toolchain-20110313.tar.bz2" && \

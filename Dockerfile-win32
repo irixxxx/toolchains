@@ -1,0 +1,35 @@
+# build container for windows (32 and 64 bit)
+
+# libs and compiler from	: mxe
+
+FROM --platform=linux/amd64 debian:buster
+
+ENV UNPRIVILEGED_USER_GROUPS=sudo
+
+# minimal build environment
+RUN	apt-get update && \
+	apt-get -y --no-install-recommends install sudo make vim git-core wget curl zip bzip2 xz-utils file gcc g++ gnupg ca-certificates && \
+	apt-get -y autoremove && apt-get -y clean
+
+# toolchain and libraries
+ENV MXE_PACKAGES \
+	mxe-x86-64-w64-mingw32.static-gcc \
+	mxe-x86-64-w64-mingw32.static-libpng \
+	mxe-x86-64-w64-mingw32.static-pkgconf \
+	mxe-x86-64-w64-mingw32.static-sdl \
+	mxe-x86-64-w64-mingw32.static-zlib \
+	mxe-x86-64-w64-mingw32.static-dlfcn-win32 \
+	mxe-i686-w64-mingw32.static-gcc \
+	mxe-i686-w64-mingw32.static-libpng \
+	mxe-i686-w64-mingw32.static-pkgconf \
+	mxe-i686-w64-mingw32.static-sdl \
+	mxe-i686-w64-mingw32.static-zlib \
+	mxe-i686-w64-mingw32.static-dlfcn-win32
+
+RUN echo "deb http://pkg.mxe.cc/repos/apt buster main" > /etc/apt/sources.list.d/mxeapt.list && \
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 86B72ED9 && \
+	apt-get update && \
+	apt-get install -y $MXE_PACKAGES
+
+ENV PATH=/usr/lib/mxe/usr/bin:$PATH
+ENV CROSS_COMPILE=x86_64-w64-mingw32.static-
