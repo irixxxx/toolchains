@@ -1,0 +1,25 @@
+# build container for gcw-0 with JZ4770
+
+# libs and compiler from	: opendingux 2014 toolchain, gcc 4.9
+
+# the gcw0 toolchain is x86 32 bit. However, since github blessed us with actions exclusively running on x86 64 bit...
+#FROM --platform=linux/386 debian:bookworm
+FROM --platform=linux/amd64 debian:bookworm
+
+ENV UNPRIVILEGED_USER_GROUPS=sudo
+
+# minimal build environment
+RUN	apt-get update && \
+	apt-get -y --no-install-recommends install sudo make vim git-core wget curl zip bzip2 xz-utils file gcc g++ ca-certificates && \
+	apt-get -y --no-install-recommends install libc6-i386 libstdc++6-i386-cross squashfs-tools && \
+	apt-get -y autoremove && apt-get -y clean
+
+# toolchain and libraries
+RUN	wget --no-check-certificate "https://web.archive.org/web/http://www.gcw-zero.com/files/opendingux-gcw0-toolchain.2014-08-20.tar.bz2" && \
+#RUN	wget --no-check-certificate "https://git.libretro.com/libretro-infrastructure/libretro-build-dingux/-/raw/master/toolchain/opendingux-gcw0-toolchain.2014-08-20.tar.bz2" && \
+	tar xjCf /opt opendingux-gcw0-toolchain.2014-08-20.tar.bz2
+
+# toolchain definitions
+ENV LD_LIBRARY_PATH=/usr/i686-linux-gnu/lib
+ENV PATH=/opt/gcw0-toolchain/usr/bin:$PATH
+ENV CROSS_COMPILE=mipsel-linux-

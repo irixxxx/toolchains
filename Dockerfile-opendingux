@@ -2,7 +2,10 @@
 # gcw-0, rg350/280, gkd350h/mini, and similar devices
 
 # libs from	: opendingux 2014 toolchain, gcc 4.9
-# compiler from	: odbeta 2021 toolchain
+# compiler from	: debian MIPS cross compiler
+
+# NB shouldn't use the 2022.09.22 od beta gcw0 toolchain since it uses JZ4770 specific extensions not working on Ingenic's newer X1800+
+# instead, use debian's standard MIPS cross compiler. That requires some fiddling though, since it isn't using --sysroot for everything.
 
 # the gcw0 toolchain is x86 32 bit. However, since github blessed us with actions exclusively running on x86 64 bit...
 #FROM --platform=linux/386 debian:bookworm
@@ -10,35 +13,35 @@ FROM --platform=linux/amd64 debian:bookworm
 
 ENV UNPRIVILEGED_USER_GROUPS=sudo
 
-# minimal build environment
+# minimal build environment, plus MIPS cross compiler
 RUN	apt-get update && \
 	apt-get -y --no-install-recommends install sudo make vim git-core wget curl zip bzip2 xz-utils file gcc g++ ca-certificates && \
-	apt-get -y --no-install-recommends install libc6-i386 libstdc++6-i386-cross && \
+	apt-get -y --no-install-recommends install libc6-i386 libstdc++6-i386-cross gcc-mipsel-linux-gnu squashfs-tools && \
 	apt-get -y autoremove && apt-get -y clean
 
 # toolchain and libraries
-# 2014 toolchain uses gcc 4.9, but we can use the current 2021 od beta toolchain's gcc to get a better optimisation
-# the Rogue FW toolchain cannot be used since it has some newer library versions not available in gcw0 opendingux
-#RUN	wget --no-check-certificate "https://github.com/Ninoh-FOX/toolchain/releases/download/08-09-2021/opendingux-gcw0-toolchain.2021-09-08.tar.bz2" && \
-#	tar xjCf /opt opendingux-gcw0-toolchain.2021-09-08.tar.bz2
 #RUN	wget --no-check-certificate "https://od.abstraction.se/opendingux/toolchain/opendingux-gcw0-toolchain.2021-10-22.tar.xz" && \
 #	tar xaCf /opt opendingux-gcw0-toolchain.2021-10-22.tar.xz && \
-RUN	wget --no-check-certificate "https://github.com/OpenDingux/buildroot/releases/download/od-2022.09.22/opendingux-gcw0-toolchain.2022-09-22.tar.xz" && \
-	tar xaCf /opt opendingux-gcw0-toolchain.2022-09-22.tar.xz && \
-	mv /opt/gcw0-toolchain /opt/gcw0-toolchain-od
+#RUN	wget --no-check-certificate "https://github.com/OpenDingux/buildroot/releases/download/od-2022.09.22/opendingux-gcw0-toolchain.2022-09-21.tar.xz" && \
+#	tar xaCf /opt opendingux-gcw0-toolchain.2022-09-21.tar.xz && \
+#	mv /opt/gcw0-toolchain /opt/gcw0-toolchain-od
+
+# 2014 toolchain uses gcc 4.9, but we can use the current debian MIPS cross compiler to get a better optimisation
 RUN	wget --no-check-certificate "https://web.archive.org/web/http://www.gcw-zero.com/files/opendingux-gcw0-toolchain.2014-08-20.tar.bz2" && \
 #RUN	wget --no-check-certificate "https://git.libretro.com/libretro-infrastructure/libretro-build-dingux/-/raw/master/toolchain/opendingux-gcw0-toolchain.2014-08-20.tar.bz2" && \
 	tar xjCf /opt opendingux-gcw0-toolchain.2014-08-20.tar.bz2
 
 # toolchain definitions
 #ENV LD_LIBRARY_PATH=/usr/i686-linux-gnu/lib
-#ENV PATH=/opt/gcw0-toolchain/usr/bin:$PATH
-ENV PATH=/opt/gcw0-toolchain-od/usr/bin:$PATH
+#ENV PATH=/opt/gcw0-toolchain-od/usr/bin:$PATH
 ENV TC=/opt/gcw0-toolchain
 ENV TS=$TC/usr/mipsel-gcw0-linux-uclibc/sysroot
-ENV CFLAGS="--sysroot $TS -I$TS/usr/include/SDL -mabicalls"
-ENV LDFLAGS="$CFLAGS -Wl,--dynamic-linker=/lib/ld-uClibc.so.0 -B$TC/usr/lib/gcc/mipsel-gcw0-linux-uclibc/4.9.1"
+ENV SYSFLAGS="--sysroot $TS -mabicalls -march=mips32r2"
+# need -isystem otherwise cross gcc would use the system includes
+ENV CFLAGS="$SYSFLAGS -isystem $TS/usr/include -I$TS/usr/include/SDL"
+# black magic to get cross gcc to use the fundamental link script files from the opendingux toolchain
+ENV LDFLAGS="$SYSFLAGS -Wl,--dynamic-linker=/lib/ld-uClibc.so.0 -B$TS/usr/lib -L$TC/usr/lib/gcc/mipsel-gcw0-linux-uclibc/4.9.1"
 # NB on newer GKD firmware there's a problem with missing exception handlers in
 # libgcc_s.so. Undefining those functions and linking in libgcc_eh solves this.
-ENV LDFLAGS="$LDFLAGS -u__register_frame_info -u__deregister_frame_info -L$TS/../lib -lgcc_eh"
-ENV CROSS_COMPILE=mipsel-linux-
+ENV LDFLAGS="$LDFLAGS -u__register_frame_info -u__deregister_frame_info -lgcc_eh -static-libgcc"
+ENV CROSS_COMPILE=mipsel-linux-gnu-
